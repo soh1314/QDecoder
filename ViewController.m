@@ -63,6 +63,22 @@
     
 }
 
+- (void)decodeComplete:(QDecoder *)decoder {
+    NSLog(@"decode finish");
+    self.decoder.delegate = nil;
+    NSURL *url  = [[NSBundle mainBundle] URLForResource:@"5" withExtension:@"mp4"];
+    self.decoder = [QDecoder new];
+    self.decoder.delegate = self;
+    self.decoder.path = [url path];
+    
+    self.decoder.decordType = QHardWareDecode;
+    
+    NSOperationQueue *queue = [NSOperationQueue new];
+    [self.decoder startExecutionBlock];
+    [queue addOperation:self.decoder];
+    
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

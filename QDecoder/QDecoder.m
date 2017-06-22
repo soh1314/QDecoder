@@ -29,6 +29,9 @@ dispatch_async(dispatch_get_main_queue(), block);\
 
 @implementation QDecoder
 
+- (void)dealloc {
+    self.delegate = nil;
+}
 
 - (instancetype)initWithPath:(NSString *)path {
     if (self = [super init]) {
@@ -85,7 +88,6 @@ dispatch_async(dispatch_get_main_queue(), block);\
 - (void)internalDecode {
     [self.videoReader startReading];
     while ([self.videoReader status] == AVAssetReaderStatusReading && self.videoTrack.nominalFrameRate > 0 && ![self isCancelled]) {
-        
         // 读取 video sample
         self.bufferRef = [self.readerOutput copyNextSampleBuffer];
         /** 存储视频每一帧*/
@@ -101,9 +103,14 @@ dispatch_async(dispatch_get_main_queue(), block);\
         if (self.failCount > 10) {
             NSLog(@"QDecoder warning : decode failcount > 10");
         }
-        // 根据需要休眠一段时间；比如上层播放视频时每帧之间是有间隔的
         [NSThread sleepForTimeInterval:self.timeInterval];
     }
+    
+    [self.videoReader cancelReading];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(decodeComplete:)]) {
+        [self.delegate decodeComplete:self];
+    }
+    
 }
 
 

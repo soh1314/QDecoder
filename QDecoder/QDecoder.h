@@ -18,6 +18,8 @@
 
 - (void)prepareDecode:(QDecoder *)decoder;
 
+- (void)decodeComplete:(QDecoder *)decoder;
+
 @end
 
 typedef enum : NSUInteger {
